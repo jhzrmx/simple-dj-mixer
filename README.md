@@ -1,3 +1,5 @@
+# Simple DJ Mixer in SolidJS
+
 ## Usage
 
 ```bash
