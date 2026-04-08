@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
+    "solid-icons": "^1.2.0",
     "solid-js": "^1.9.12",
     "wavesurfer.js": "^7.12.5",
     "web-audio-beat-detector": "^8.2.36"

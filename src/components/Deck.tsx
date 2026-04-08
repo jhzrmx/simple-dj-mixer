@@ -1,5 +1,12 @@
 import { createSignal, onMount } from 'solid-js';
 import WaveSurfer from 'wavesurfer.js';
+import {
+  FaSolidArrowsRotate,
+  FaSolidFileArrowUp,
+  FaSolidMusic,
+  FaSolidPause,
+  FaSolidPlay,
+} from 'solid-icons/fa';
 import { useAudioStore } from '../store/audioStore';
 import { detectBPM, normalizeBPM } from '../utils/bpmDetector';
 import { formatTime } from '../utils/formatTime';
@@ -234,9 +241,7 @@ export function Deck(props: DeckProps) {
           }}
           class="px-4 py-1.5 rounded-full font-bold text-xs cursor-pointer transition-all shadow-md flex items-center gap-1.5 active:scale-95"
         >
-          <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 fill-current" aria-hidden="true">
-            <path d="M12 5a7 7 0 0 1 6.36 4H16a1 1 0 1 0 0 2h5a1 1 0 0 0 1-1V5a1 1 0 1 0-2 0v2.06A9 9 0 0 0 3 12a1 1 0 1 0 2 0 7 7 0 0 1 7-7Zm9 6a1 1 0 0 0-1 1 7 7 0 0 1-13.36 3H9a1 1 0 1 0 0-2H4a1 1 0 0 0-1 1v5a1 1 0 1 0 2 0v-2.06A9 9 0 0 0 21 12a1 1 0 0 0-1-1Z" />
-          </svg>
+          <FaSolidArrowsRotate class="w-3.5 h-3.5" />
           SYNC TO {isLeft ? 'B' : 'A'}
         </button>
       </div>
@@ -263,9 +268,7 @@ export function Deck(props: DeckProps) {
             class="absolute inset-0 rounded-full bg-radial from-[#2d3348] to-[#0c0f18] shadow-2xl border-2 border-white/20 flex items-center justify-center"
           >
             <div class="w-15 h-15 rounded-full bg-radial from-[#c0d0ff] to-[#2a3a7a] shadow-inner flex items-center justify-center">
-              <svg viewBox="0 0 24 24" class="w-7 h-7 text-[#101b3b] fill-current" aria-hidden="true">
-                <path d="M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18Zm0 5a4 4 0 1 1 0 8a4 4 0 0 1 0-8Z" />
-              </svg>
+              <FaSolidMusic class="w-7 h-7 text-[#101b3b]" />
             </div>
           </div>
           <div
@@ -277,10 +280,7 @@ export function Deck(props: DeckProps) {
 
       <label class="block bg-[#202536] text-center py-2 rounded-full text-sm font-medium text-[#cddcff] cursor-pointer transition-all hover:bg-[#2c334e] hover:border-[#6a7bc0] border border-[#3a405a]">
         <span class="inline-flex items-center gap-2">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current" aria-hidden="true">
-            <path d="M4 4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Zm10 0v4h4" />
-            <path d="M12 10a1 1 0 0 1 1 1v3.59l1.3-1.3a1 1 0 1 1 1.4 1.42l-3 3a1 1 0 0 1-1.4 0l-3-3a1 1 0 1 1 1.4-1.42l1.3 1.3V11a1 1 0 0 1 1-1Z" />
-          </svg>
+          <FaSolidFileArrowUp class="w-4 h-4" />
           LOAD TRACK
         </span>
         <input
@@ -303,13 +303,9 @@ export function Deck(props: DeckProps) {
           title={isPlaying() ? 'Pause' : 'Play'}
         >
           {isPlaying() ? (
-            <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current" aria-hidden="true">
-              <path d="M7 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Zm10 0a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Z" />
-            </svg>
+            <FaSolidPause class="w-5 h-5" />
           ) : (
-            <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current" aria-hidden="true">
-              <path d="M8 5.5A1.5 1.5 0 0 1 10.3 4.2l8 6a2.2 2.2 0 0 1 0 3.6l-8 6A1.5 1.5 0 0 1 8 18.5v-13Z" />
-            </svg>
+            <FaSolidPlay class="w-5 h-5" />
           )}
         </button>
       </div>
