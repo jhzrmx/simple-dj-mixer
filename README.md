@@ -1,5 +1,7 @@
 # Simple DJ Mixer in SolidJS
 
+Live preview [here](https://jhzrmx.github.io/simple-dj-mixer/).
+
 ## Usage
 
 ```bash
