@@ -47,17 +47,31 @@ export function AudioProvider(props: { children: any }) {
 
     manager.setGainUpdate(() => {
       const cross = store.crossfader;
-      const curve = Math.pow(cross, 1.5);
-      if (cross < 0.5) {
-        manager.setLeftGain(1);
-        manager.setRightGain(curve * 2);
-      } else {
-        manager.setLeftGain((1 - curve) * 2);
-        manager.setRightGain(1);
-      }
+      // Equal-power crossfade prevents volume drop at center.
+      const leftGain = Math.cos(cross * 0.5 * Math.PI);
+      const rightGain = Math.sin(cross * 0.5 * Math.PI);
+      manager.setLeftGain(leftGain);
+      manager.setRightGain(rightGain);
     });
 
+    manager.updateGains();
     startVUMeter();
+  };
+
+  const smoothLevel = (raw: number, current: number) => {
+    const noiseFloor = 0.005;
+    const nextRaw = raw < noiseFloor ? 0 : raw;
+
+    if (nextRaw === 0) {
+      const decayed = current * 0.82;
+      return decayed < 0.01 ? 0 : decayed;
+    }
+
+    if (nextRaw >= current) {
+      return current * 0.65 + nextRaw * 0.35;
+    }
+
+    return current * 0.88 + nextRaw * 0.12;
   };
 
   const startVUMeter = () => {
@@ -66,15 +80,14 @@ export function AudioProvider(props: { children: any }) {
         const leftRaw = store.audioCtxManager.getLeftLevel();
         const rightRaw = store.audioCtxManager.getRightLevel();
 
-        const newLeft = leftRaw > smoothedLeft() ? leftRaw : smoothedLeft() * 0.92 + leftRaw * 0.08;
-        const newRight = rightRaw > smoothedRight() ? rightRaw : smoothedRight() * 0.92 + rightRaw * 0.08;
+        const newLeft = smoothLevel(leftRaw, smoothedLeft());
+        const newRight = smoothLevel(rightRaw, smoothedRight());
 
         setSmoothedLeft(newLeft);
         setSmoothedRight(newRight);
         setStore('leftLevel', newLeft);
         setStore('rightLevel', newRight);
 
-        // Update VU rings
         updateVURing('left', newLeft);
         updateVURing('right', newRight);
       }
@@ -148,13 +161,15 @@ export function AudioProvider(props: { children: any }) {
   };
 
   const setCrossfader = (value: number) => {
-    setStore('crossfader', value);
+    const clamped = Math.min(1, Math.max(0, value));
+    setStore('crossfader', clamped);
     store.audioCtxManager?.updateGains();
   };
 
   const value = {
     leftLevel: () => store.leftLevel,
     rightLevel: () => store.rightLevel,
+    crossfader: () => store.crossfader,
     connectDeck,
     ensureConnection,
     resumeContext,

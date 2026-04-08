@@ -52,6 +52,8 @@ export class AudioContextManager {
       this.sourceRightAudio = audio;
       this.sourceRight.connect(this.gainRight!);
     }
+
+    this.updateGains();
   }
 
   setGainUpdate(callback: () => void) {
@@ -63,34 +65,39 @@ export class AudioContextManager {
   }
 
   setLeftGain(value: number) {
-    if (this.gainLeft) this.gainLeft.gain.value = value;
+    if (!this.gainLeft) return;
+    this.gainLeft.gain.value = Math.max(0, Math.min(1, value));
   }
 
   setRightGain(value: number) {
-    if (this.gainRight) this.gainRight.gain.value = value;
+    if (!this.gainRight) return;
+    this.gainRight.gain.value = Math.max(0, Math.min(1, value));
+  }
+
+  private getRmsLevel(analyser: AnalyserNode | null, audio: HTMLAudioElement | null): number {
+    if (!analyser || !audio || audio.paused || audio.ended) return 0;
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteTimeDomainData(data);
+
+    let sumSquares = 0;
+    for (let i = 0; i < data.length; i++) {
+      const normalized = (data[i] - 128) / 128;
+      sumSquares += normalized * normalized;
+    }
+
+    const rms = Math.sqrt(sumSquares / data.length);
+    const boosted = Math.min(1, rms * 2.8);
+
+    // Ignore analyser noise floor to prevent a single lingering VU bar when paused.
+    return boosted < 0.03 ? 0 : boosted;
   }
 
   getLeftLevel(): number {
-    if (!this.analyserLeft) return 0;
-    const data = new Uint8Array(this.analyserLeft.frequencyBinCount);
-    this.analyserLeft.getByteTimeDomainData(data);
-    let max = 0;
-    for (let i = 0; i < data.length; i++) {
-      const v = Math.abs((data[i] - 128) / 128);
-      max = Math.max(max, v);
-    }
-    return Math.min(1, max * 1.4);
+    return this.getRmsLevel(this.analyserLeft, this.sourceLeftAudio);
   }
 
   getRightLevel(): number {
-    if (!this.analyserRight) return 0;
-    const data = new Uint8Array(this.analyserRight.frequencyBinCount);
-    this.analyserRight.getByteTimeDomainData(data);
-    let max = 0;
-    for (let i = 0; i < data.length; i++) {
-      const v = Math.abs((data[i] - 128) / 128);
-      max = Math.max(max, v);
-    }
-    return Math.min(1, max * 1.4);
+    return this.getRmsLevel(this.analyserRight, this.sourceRightAudio);
   }
 }
